@@ -2,7 +2,6 @@ aiohttp==3.8.1
 aiosignal==1.2.0
 alabaster==0.7.12
 altair==5.1.1
-anaconda-anon-usage==0.3.0
 anaconda-client==1.9.0
 anaconda-navigator==2.4.3
 anaconda-project==0.10.2
