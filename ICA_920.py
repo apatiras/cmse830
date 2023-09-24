@@ -3,7 +3,7 @@ import pandas as pd
 import seaborn as sns 
 
 #reading the csv file 
-wi_data=pd.read_csv("C:/Users/apati/OneDrive/Documents/Michigan State/CMSE 830/wi_data.csv")
+wi_data=pd.read_csv("wi_data.csv")
 
 st.write("Pick Features to display in pairplot")
 
