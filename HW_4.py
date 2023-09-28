@@ -9,14 +9,16 @@ col1, col2, col3 = st.columns([1,2,1])
 col1.markdown("# Welcome to my app!")
 col1.markdown("This is the Best App You've Ever Seen")
 
-cd = pd.read_csv("lagos-rent.csv")
+col1, col2, col3 = st.columns([1,2,1])
+col1.markdown("# Welcome to my app!")
+col1.markdown("This is the Best App You've Ever Seen")
+cd = pd.read_csv("US_birthrates_by_race.csv")
 cd_columns = list(cd.columns.values)
 option1 = st.selectbox('Choose a x-value',(cd_columns))
 option2 = st.selectbox('Choose a y-value',(cd_columns))
 st.write('You selected:', option1, "and", option2)
 # plot = sns.pairplot(cd[option1,option2])
-st.pyplot(sns.relplot(data=cd, x= option1,y=option2,hue="City"))
-
+st.pyplot(sns.relplot(data=cd, x= option1,y=option2,hue="Race"))
 
 
 if "photo" not in st.session_state:
