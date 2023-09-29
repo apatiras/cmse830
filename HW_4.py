@@ -9,9 +9,7 @@ col1, col2, col3 = st.columns([1,2,1])
 col1.markdown("# Welcome to my app!")
 col1.markdown("This is the Best App You've Ever Seen")
 
-col1, col2, col3 = st.columns([1,2,1])
-col1.markdown("# Welcome to my app!")
-col1.markdown("This is the Best App You've Ever Seen")
+
 cd = pd.read_csv("US_birthrates_by_race.csv")
 cd_columns = list(cd.columns.values)
 option1 = st.selectbox('Choose a x-value',(cd_columns))
