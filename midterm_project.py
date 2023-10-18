@@ -41,14 +41,6 @@ currency_name = st.sidebar.text_input("Enter Currency Name", "Naira")
 data['converted_price'] = data['price'] * conversion_rate
 
 st.sidebar.title("Page Navigation")
-# st.sidebar.markdown("[Average Housing Price by State](#average_housing_price_by_state)")
-# st.sidebar.markdown("[Average Housing Price by town](#average_housing_price_by_town)")
-# st.sidebar.markdown("[Average Housing Price by House Type](#average_housing_price_by_title)")
-# st.sidebar.markdown("[Nigeria Housing Dataset 3D Scatter Plot](#3D_Scatterplot)")
-# st.sidebar.markdown("[Interactive Histogram of Characteristic Distribution](#interactive_histogram)")
-# st.sidebar.markdown("[Housing Price Estimator](#estimator)")
-
-
 
 st.markdown(" To first understand this dataset, explore the mean prices of houses by state")
 ################################################################################################################################################################
@@ -182,7 +174,12 @@ similar_houses = data[
 
 
 average_price = similar_houses['price'].mean()
+average_price_convert = average_price * conversion_rate
+
 st.write(f"Average Price for Similar Houses: ₦{average_price:.2f}")
+st.write(f"Average Price for Similar Houses {currency_name}: {average_price_convert:.2f}")
+
+
 
 
 # Find towns with similar prices
