@@ -180,11 +180,10 @@ similar_houses = data[
 ]
 
 
-if not similar_houses.empty:
-    average_price = similar_houses['price'].mean()
-    st.write(f"Average Price for Similar Houses: ₦{average_price:.2f}")
-else:
-    st.write("No houses with similar characteristics found.")
+
+average_price = similar_houses['price'].mean()
+st.write(f"Average Price for Similar Houses: ₦{average_price:.2f}")
+
 
 # Find towns with similar prices
 similar_towns = data[
