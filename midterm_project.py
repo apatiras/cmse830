@@ -10,171 +10,192 @@ import hiplot as hip
 import json
 import numpy as np
 import plotly.figure_factory as ff
+import altair
 
 data = pd.read_csv("nigeria_houses_data.csv")
+mean_vals = data.groupby('state').mean()
+subdata = mean_vals.reset_index()
 
 
 #introductory material 
 st.markdown(" # Welcome! Explore Nigeria's Housing Market")
-
-st.markdown("The purpose of this app is to help users explore the housing market in various parts of Nigeria. Please enjoy!")
-
+st.markdown("My project aims to create a web app that can visualize housing prices in Nigeria based on the state, town, and various other factors. Nigeria’s economic system is heavily negotiation-based. Whether in the market or looking for a house, almost every price in Nigeria is negotiable. Currently, some severe issues with the country’s economy leave locals and foreigners vulnerable to unreasonable rates.  With my web app, those not accustomed to the typical way of negotiations can first view housing prices in specific areas to avoid getting talked into paying more for less.  Additionally, locals may be able to use the app to visualize which areas are financially reasonable for their living. The dataset for this project contains 24,326 rows and 8 columns of housing data for Nigeria. ")
+#image
 image = Image.open("project_photo.jpg")
 st.image(image, caption="Lagos Island skyline from Victoria Island")
+#View data 
+st.markdown(" Before beginning your exploration, please feel free to use the two follwing check boxes to view the data and basic statistics.")
+col1, col2,= st.columns([3,3])
+dfprint = col1.checkbox("Click to view the dataset")
+if dfprint: 
+    st.dataframe(data=data)
+statprint = col2.checkbox("Click to view the basic data statistics")
+if statprint:
+    df_descr = data.describe(include="all")
+    st.write(df_descr)
 
-#interactive chart 
-# 3D scatter plot using Plotly
-fig = px.scatter_3d(data, x='bedrooms', y='bathrooms', z='parking_space', color='state')
-st.title("Nigeria Housing Dataset 3D Scatter Plot")
-st.write("This interactive 3D scatter plot visualizes the housing dataset with bedrooms, bathrooms, and parking as the axes.")
-st.plotly_chart(fig, use_container_width=True)
+##################################################################################################################################################################################
+st.sidebar.markdown(" # Currency Converter")
+conversion_rate = st.sidebar.number_input("Dataframe defaults to prices in Naira. Enter Conversion Rate of preferred currency below: ", value=1.0000, step=0.001)
+currency_name = st.sidebar.text_input("Enter Currency Name", "Naira")
+data['converted_price'] = data['price'] * conversion_rate
 
-###############################################################################
-#Exploratory Data Analysis
-#
-#Hiplot Visualization 
-st.header("Hiplot visualization")
-exp = hip.Experiment.from_dataframe(data)
-st_hiplot=st.empty()
-st.write(exp)
+st.sidebar.title("Page Navigation")
+# st.sidebar.markdown("[Average Housing Price by State](#average_housing_price_by_state)")
+# st.sidebar.markdown("[Average Housing Price by town](#average_housing_price_by_town)")
+# st.sidebar.markdown("[Average Housing Price by House Type](#average_housing_price_by_title)")
+# st.sidebar.markdown("[Nigeria Housing Dataset 3D Scatter Plot](#3D_Scatterplot)")
+# st.sidebar.markdown("[Interactive Histogram of Characteristic Distribution](#interactive_histogram)")
+# st.sidebar.markdown("[Housing Price Estimator](#estimator)")
 
-#################################################################
+
+
+st.markdown(" To first understand this dataset, explore the mean prices of houses by state")
+################################################################################################################################################################
+# Bar Chart By State
+st.header("Average Housing Price by State")
+if st.sidebar.button("Go to Housing Price by State"):
+    st.markdown("[Jump to Average Housing Price by State](#average_housing_price_by_state)")
+
+
+mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
+mean_prices_by_state = data.groupby('state')['converted_price'].mean().sort_values(ascending=True)
+
+st.bar_chart(mean_prices_by_state, use_container_width=True)
+
+col1, col2,= st.columns([3,3])
+with col1: 
+    st.write("Mean Prices by State (Naira):")
+    st.write(mean_prices_by_state_org)
+with col2: 
+    st.write("Mean Prices by State (Converted to {}):".format(currency_name))
+    st.write(mean_prices_by_state)
+###############################################################################################################################################
+st.header("Average Housing Price by Town")
+if st.sidebar.button("Go to Housing Price by Town"):
+    st.markdown("[Jump to Average Housing Price by Town](#average_housing_price_by_town)")
+mean_prices_by_town = data.groupby('town')['converted_price'].mean().sort_values(ascending=True)
+mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
+st.bar_chart(mean_prices_by_town, use_container_width=True)
+
+col1, col2,= st.columns([3,3])
+with col1: 
+    st.write("Mean Prices by Town (Naira):")
+    st.write(mean_prices_by_town_org)
+with col2: 
+    st.write("Mean Prices by Town (Converted to {}):".format(currency_name))
+    st.write(mean_prices_by_town)
+###############################################################################################################################################
+st.header("Average Housing Price by House Type")
+if st.sidebar.button("Go to Housing Price by House Type"):
+    st.markdown("[Jump to Average Housing Price by House Type](#average_housing_price_by_title)")
+
+mean_prices_by_title= data.groupby('title')['converted_price'].mean().sort_values(ascending=True)
+mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
+
+st.bar_chart(mean_prices_by_title, use_container_width=True)
+col1, col2,= st.columns([3,3])
+with col1: 
+    st.write("Mean Prices by House Type (Naira):")
+    st.write(mean_prices_by_title_org)
+with col2: 
+    st.write("Mean Prices by House Type (Converted to {}):".format(currency_name))
+    st.write(mean_prices_by_title)
+
+###############################################################################################################################################
 #Correlation heatmap
+st.header("Correlation Heatmap")
+if st.sidebar.button("Go to Correlation Heatmap"):
+    st.markdown("[Jump to Correlation Heatmap](#correlation_heatmap)")
+
 fig, ax = plt.subplots()
 sns.heatmap(data.corr(), annot= True, ax=ax)
-st.write(fig)
+st.write("Here is a heatmap that displays correlations of the data",fig)
 
-#############################################################################
-#relplot
+##############################################################################################################################################
+st.markdown("From the bar chart and Heatmap we see that Lagos and Abuja are the most expensive states in the housing market.Ikoyi in particular is the town with the highest housing prices.  The heatmap tells us that bedrooms and bathrooms are most correlated with price.")
+###############################################################################################################################################
+#interactive chart 
+# 3D scatter plot using Plotly
+st.header("Nigeria Housing Dataset 3D Scatter Plot")
+if st.sidebar.button("Go to 3D Scatterplot"):
+    st.markdown("[Jump to 3D Scatterplot](#3d_scatterplot)")
+
 data_columns = list(data.columns.values)
-option1 = st.selectbox('Choose a x-value',(data_columns))
-option2 = st.selectbox('Choose a y-value',(data_columns))
-st.write('You selected:', option1, "and", option2)
-st.pyplot(sns.relplot(data=data, x= option1,y=option2))
-##############################################################################
-st.title("Average Housing Price by State")
+options = st.multiselect("Pick three column paramaters for 3D Scatterplot", data_columns)
+selected_state = st.multiselect("Select State to Display", data['state'].unique())
 
-# Create a dropdown to select the state
-selected_state = st.selectbox("Select a State", data['state'].unique())
+if len(options) >= 3:  
+    filtered_data = data[data['state'].isin(selected_state)]
+    fig = px.scatter_3d(filtered_data, x=options[0], y=options[1], z=options[2], color='state')
+    st.write("This interactive 3D scatter plot visualizes the housing dataset with the selected axes.")
+    st.plotly_chart(fig, use_container_width=True)
+else: 
+    st.write("Please select columns to create the 3D scatter plot.")
 
-# Input for the exchange rate
-exchange_rate = st.number_input("Enter the Exchange Rate (NGN to USD)", value=0.0013)
+##################################################################################################################################################
+# #Hiplot Visualization 
+# st.header("Hiplot visualization")
+# exp = hip.Experiment.from_dataframe(data)
+# st_hiplot=st.empty()
+# st.write(exp)
+###################################################################################################################################################
 
-# Filter the data by the selected state
-filtered_data = data[data['state'] == selected_state]
+# Interactive histogram
+st.header("Interactive Histogram of Characteristic Distribution")
+if st.sidebar.button("Go to Characteristic Distribution"):
+    st.markdown("[Jump to Characteristic Histograms](#characteristic_histograms)")
 
-# Calculate the average price for the selected state
-avg_price_ngn = filtered_data['price'].mean()
-avg_price_usd = avg_price_ngn * exchange_rate
-
-# Display the average price in both NGN and USD
-st.write(f"Average Price of Housing in {selected_state}:")
-st.write(f"In NGN: ₦{avg_price_ngn:.2f}")
-st.write(f"In USD: ${avg_price_usd:.2f}")
-average_prices_by_state = data.groupby('state')['price'].mean().reset_index()
-average_prices_usd = average_prices_by_state['price'] * exchange_rate
-average_prices_by_state['price_usd'] = average_prices_usd
-plt.bar(average_prices_by_state['state'], average_prices_by_state['price_usd'])
-plt.xlabel('State')
-plt.ylabel('Average Price (USD)')
-plt.title('Average Housing Price by State (USD)')
-st.pyplot()
-
-# Optionally, you can display the data table for the selected state
-st.write("Data for", selected_state)
-st.write(filtered_data)
-
-
-#######################################################################
-#interactive histogram 
-st.title("Housing Data Analysis")
-characteristic = st.selectbox("Select a Housing Characteristic", ['bathrooms', 'bedrooms', 'toilets', 'parking_space', 'state'])
+data = pd.read_csv("nigeria_houses_data.csv")
+characteristic = st.selectbox("Select a Housing Characteristic", ['bathrooms', 'bedrooms', 'toilets', 'parking_space'])
 
 filtered_data = data[characteristic].dropna()  # Drop any NaN values
 
-fig = ff.create_distplot([filtered_data], [characteristic], bin_size=[0.1])
+fig = ff.create_distplot([filtered_data],[characteristic], bin_size=0.1)
 st.plotly_chart(fig, use_container_width=True)
+
 st.write(f"Summary statistics for {characteristic}:")
 st.write(filtered_data.describe())
 
+######################################################################################################################################
+st.header("Housing Price Estimator")
+if st.sidebar.button("Go to Housing Price Estimator"):
+    st.markdown("[Jump to Housing Price Estimator](#price_estimator)")
 
-st.write("Pick Features to display in pairplot")
-
-bathrooms=st.checkbox("bathrooms")
-bedrooms=st.checkbox("bedrooms")
-toilets=st.checkbox("toilets")
-parking_space=st.checkbox('parking_space')
-
-###########################################################################
-#relplot
 data = pd.read_csv("nigeria_houses_data.csv")
+mean_vals = data.groupby('town').mean()
+average_values = mean_vals.reset_index()
 
-s=[]
-if "bathrooms" in data.columns:
-    s.append("bathrooms")
-if "bedrooms" in data.columns:
-    s.append("bedrooms")
-if "toilets" in data.columns:
-    s.append("toilets")
-if "parking_space" in data.columns:
-    s.append("parking_space")
 
-# Check if any variables are left to plot
-if not s:
-    print("No valid variables to plot.")
+bedrooms = st.number_input("Bedrooms", min_value=1.0, max_value=9.0, step=0.5)
+bathrooms = st.number_input("Bathrooms", min_value=1.0, max_value=9.0, step=0.5)
+parking_spaces = st.number_input("Parking Spaces", min_value=0.0, max_value=9.0, step=0.5)
+toilets = st.number_input("Toilets", min_value=1.0, max_value=9.0, step=0.5)
+
+similar_houses = data[
+    (data['bedrooms'] == bedrooms) &
+    (data['bathrooms'] == bathrooms) &
+    (data['parking_space'] == parking_spaces) &
+    (data['toilets'] == toilets)
+]
+
+
+if not similar_houses.empty:
+    average_price = similar_houses['price'].mean()
+    st.write(f"Average Price for Similar Houses: ₦{average_price:.2f}")
 else:
-    # Remove missing values
-    data_cleaned = data[s].dropna()
+    st.write("No houses with similar characteristics found.")
 
-    if data_cleaned.shape[1] < 2:
-        print("Insufficient data to create a pairplot with 2 or more variables.")
-    else:
-        # Create the pairplot
-        plot = sns.pairplot(data_cleaned)
+# Find towns with similar prices
+similar_towns = data[
+    (data['price'] >= (average_price - 10000)) &
+    (data['price'] <= (average_price + 10000))
+]
 
-        # Check if "state" exists in the DataFrame
-        if "state" in data.columns:
-            # Create a jointplot with KDE using valid data and "state" as hue
-            g = sns.jointplot(
-                data=data_cleaned,
-                x="bathrooms", y="bedrooms", hue='parking_space', kind="kde"
-            )
+if not similar_towns.empty:
+    unique_towns = similar_towns['town'].unique()
+    st.write("Towns with Similar Prices:")
+    st.write(unique_towns)
+else:
+    st.write("No towns with similar prices found.")
 
-st.pyplot(plot)
-st.pyplot(g)
-
-# if bathrooms:
-#     s.append("bathrooms")
-
-# if bedrooms:
-#     s.append("bedrooms")
-
-# if toilets:
-#     s.append("toilets")
-
-# if parking_space:
-#     s.append('parking_space')
-
-
-# plot=sns.pairplot(data[s])
-
-
-# g = sns.jointplot(
-#     data=data,
-#     x="bathrooms", y="bedrooms", hue="state",
-#     kind="kde",
-#     )
-
-# x=sns.catplot(
-#     data=data, x="parking", y="price",
-#     kind="violin", split=True, palette="pastel",
-# )
-
-y=sns.relplot(data=data, x="bathrooms", y="bedrooms",hue="price")
-
-
-# st.pyplot(plot)
-
-# st.pyplot(g)
-# st.pyplot(x)
-st.pyplot(y)
