@@ -21,19 +21,18 @@ subdata = mean_vals.reset_index()
 
 ##################################################################################################################################################################################
 st.sidebar.markdown(" # Currency Converter")
-conversion_rate = st.sidebar.number_input("Dataframe defaults to prices in Naira. Enter Conversion Rate of preferred currency below: ", value=1.0000, step=0.001)
-currency_name = st.sidebar.text_input("Enter Currency Name", "Naira")
+conversion_rate = st.sidebar.number_input("This currency converted defaults to Naira. To use this, please enter the Conversion Rate of your preferred currency below. (For example the conversion to US Dollars would be .0013.)", format="%.4f", value=1.0000, step=None)
+currency_name = st.sidebar.text_input("To keep track of what currency you're observing, Enter Currency Name Below:", "Naira")
 data['converted_price'] = data['price'] * conversion_rate
 
-# st.sidebar.title("Page Navigation")
-
-# 
 ########################################################
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["Introduction", "Housing Types", "Explorations", "Housing Cost Estimator", "Conclusions"])
 
 with tab1:
     st.markdown(" # Welcome! Explore Nigeria's Housing Market")
-    st.markdown("My project aims to create a web app that can visualize housing prices in Nigeria based on the state, town, and various other factors. Nigeria’s economic system is heavily negotiation-based. Whether in the market or looking for a house, almost every price in Nigeria is negotiable. Currently, some severe issues with the country’s economy leave locals and foreigners vulnerable to unreasonable rates.  With my web app, those not accustomed to the typical way of negotiations can first view housing prices in specific areas to avoid getting talked into paying more for less.  Additionally, locals may be able to use the app to visualize which areas are financially reasonable for their living. The dataset for this project contains 24,326 rows and 8 columns of housing data for Nigeria. ")
+    st.markdown("This web app aims to visualize housing prices in Nigeria based on the state, town, and various other factors. Nigeria’s economic system is heavily negotiation-based. Whether you're in the market buying clothing or looking for a house, almost every price in Nigeria is negotiable. Currently, some severe issues with the country’s economy leave locals and foreigners vulnerable to unreasonable housing costs.  With this web app, those not accustomed to the typical way of negotiations can first view housing prices in specific areas to avoid getting talked into paying more for less.  Additionally, locals may be able to use the app to visualize which areas are financially reasonable for their living. The dataset for this project contains 24,326 rows and 8 columns of housing data for Nigeria.")
+    st.markdown("For those who are potentially not from Nigeria or just looking to investigate different currencies, there is a currency converter on the left sidebar of the screen. Through certain portions of this app there will be an opportunity to display the data through a converted rate. To use the currency converter, you can input any conversion rate into the first box. For example, the conversion to US dollars is 0.0013. The purpose of the second box is to keep track of what currency rate you input in the first box, so you can input rates such as 'USD' or 'Euros in that field for reference.")
+
     #image
     image = Image.open("project_photo.jpg")
     st.image(image, caption="Lagos Island skyline from Victoria Island")
@@ -114,27 +113,46 @@ with tab3:
     st.altair_chart(chart, use_container_width=True)
     if st.button("Click to read state findings."):
         st.write("From this chart we see that Lagos and Abuja are the most expensive states in Nigera. Lagos being the most populus state in the country and Abuja being the capital of the country. Inversely, Katsina and Plateau are the states with the cheapest housing prices. ")
-    col1, col2,= st.columns([3,3])
-    with col1: 
+    if conversion_rate == 1.00:
         st.write("Mean Prices by State (Naira):")
         st.write(mean_prices_by_state_org)
-    with col2: 
-        st.write("Mean Prices by State (Converted to {}):".format(currency_name))
-        st.write(mean_prices_by_state)
+    else:
+        col1, col2,= st.columns([3,3])
+        with col1: 
+            st.write("Mean Prices by State (Naira):")
+            st.write(mean_prices_by_state_org)
+        with col2: 
+            st.write("Mean Prices by State (Converted to {}):".format(currency_name))
+            st.write(mean_prices_by_state)
 
     #Average Housing Price by Town
     st.header("Average Housing Price by Town")
     st.markdown("Explore average housing prices by town in Nigeria with our interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each town.")
     mean_prices_by_town = data.groupby('town')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
-    st.bar_chart(mean_prices_by_town, use_container_width=True)
-    col1, col2,= st.columns([3,3])
-    with col1: 
+    num_town = len(mean_prices_by_town)
+    cmap = cm.get_cmap("viridis", num_town)
+    chart2 = altair.Chart(mean_prices_by_town.reset_index()).mark_bar().encode(
+        x='town:N',
+        y='converted_price:Q',
+        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='viridis'))
+    ).properties(width=600)
+    st.altair_chart(chart2, use_container_width=True)
+    
+    # st.bar_chart(mean_prices_by_town, use_container_width=True)
+    if st.button("click to read town findings."):
+        st.write("From this chart we see that Ikoyoi in Lagos,Nigeria has a highest prices by town. Ikoyi has an area called Banana Island, which is home of the wealthiest people in the entire country.")
+    if conversion_rate == 1.00:
         st.write("Mean Prices by Town (Naira):")
         st.write(mean_prices_by_town_org)
-    with col2: 
-        st.write("Mean Prices by Town (Converted to {}):".format(currency_name))
-        st.write(mean_prices_by_town)
+    else: 
+        col1, col2,= st.columns([3,3])
+        with col1: 
+            st.write("Mean Prices by Town (Naira):")
+            st.write(mean_prices_by_town_org)
+        with col2: 
+            st.write("Mean Prices by Town (Converted to {}):".format(currency_name))
+            st.write(mean_prices_by_town)
 
     #Housing Types Average Price
     st.header("Average Housing Price by House Type")
@@ -151,13 +169,17 @@ with tab3:
     st.altair_chart(chart, use_container_width=True)
     if st.button("Click to read house findings."):
         st.write("From this chart we find that a detached duplex and semi-detached duplex have the highest housing costs. Duplexes in general have a trend of costing more than bungalows. So, if you're looking for housing on the cheaper side, it may be wise to start off with explorations for bungalows.")
-    col1, col2,= st.columns([3,3])
-    with col1: 
+    if conversion_rate == 1.00:
         st.write("Mean Prices by House Type (Naira):")
         st.write(mean_prices_by_title_org)
-    with col2: 
-        st.write("Mean Prices by House Type (Converted to {}):".format(currency_name))
-        st.write(mean_prices_by_title)
+    else:
+        col1, col2,= st.columns([3,3])
+        with col1: 
+            st.write("Mean Prices by House Type (Naira):")
+            st.write(mean_prices_by_title_org)
+        with col2: 
+            st.write("Mean Prices by House Type (Converted to {}):".format(currency_name))
+            st.write(mean_prices_by_title)
     
     #Correlation Heatmap
     st.header("Correlation Heatmap")
@@ -198,7 +220,7 @@ with tab3:
 
 with tab4: 
     st.header("Housing Price Estimator")
-    st.markdown("This Housing Cost Estimator lets you explore the average price of properties based on your specific criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. Get started by adjusting the sliders and discover your ideal housing cost. Below the sliders, costs, and locations, you'll find a map to pinpoint the exact states and towns. Get started below!")
+    st.markdown("This Housing Cost Estimator lets you explore the average price of properties based on your specific criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. Get started by adjusting the sliders and discover your approximate housing cost. Below the sliders, costs, and locations, you'll find a map that pinpoints the exact states and towns for that price. Get started below!")
 
     data_cords['town_state'] = data_cords['town'] + ', ' + data_cords['state']
 
@@ -218,15 +240,22 @@ with tab4:
         st.warning("No matching data found for the selected criteria.")
     else:
         average_price = user_input['price'].mean()
-        st.write(f"Average Cost: ₦{average_price:,.2f}")
+        if conversion_rate == 1.00:
+            st.write(f"Average Cost: ₦{average_price:,.2f}")
+        else:
+            col1, col2,= st.columns([3,3])
+            with col1: 
+                st.write(f"Average Cost: ₦{average_price:,.2f}")
+            with col2: 
+                st.write(f"Average Cost: {currency_name} {average_price*conversion_rate:,.2f}")
 
         towns_with_avg_price = user_input['town_state'].unique()
 
-        st.write("Towns and States with the same average price:")
+        st.write("Towns and States with the similar average prices:")
         for town_state in towns_with_avg_price:
             st.write(f"- {town_state}")
-        
-        st.map(user_input[['latitude', 'longitude']].drop_duplicates(), use_container_width=True)
+        user_input_rem = user_input[['latitude', 'longitude']].dropna()
+        st.map(user_input_rem.drop_duplicates(), use_container_width=True)
 
 with tab5: 
     imagefinal = Image.open("nigeria_pic.jpg")
@@ -236,4 +265,4 @@ with tab5:
     st.markdown("Through a collection of user-friendly visualizations, I've designed this app to be your partner in exploring the housing landscape. Whether you're in search of your dream home or considering selling your property, this app is here to equip you with critical information to make informed decisions.")
     st.markdown("As Nigeria faces economic challenges, this app comes at an opportune time. It places the power to understand housing prices firmly in your hands. You can now gauge what to expect before embarking on your housing search or during negotiations with real estate agents. It's all about ensuring you're well-prepared and well-informed in an ever-evolving real estate market.")
     st.markdown("The reach of this app isn't limited to just buyers and sellers; it extends to anyone who might be seeking accommodations. In today's dynamic world, where housing concerns touch virtually everyone at some point, the app's versatility becomes its defining feature. It's a resource that's ready to serve you, regardless of where you stand in the real estate landscape.")
-    st.markdown("s you embark on your housing journey, remember that you're not alone. I'm here to support you with this app, and together, we can make navigating Nigeria's housing market a smoother, more informed, and ultimately, more successful experience.")
+    st.markdown("As you embark on your housing journey, remember that you're not alone. I'm here to support you with this app, and together, we can make navigating Nigeria's housing market a smoother, more informed, and ultimately, more successful experience.")
