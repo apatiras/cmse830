@@ -48,8 +48,8 @@ with tab1:
         st.write(df_descr)
 
 with tab2:
-    st.header("Welcome to our House Types Visualizer!")
-    st.markdown("Are you curious about the various housing styles in Nigeria and want to understand what different houses look like based on local terminology? Our webpage is designed to help you navigate the rich diversity of residential architecture in Nigeria and avoid any confusion when discussing house types. Explore the visual representations of various house types, from flats to bungalows and more, and gain a better understanding of the terminology used in Nigeria's housing landscape. Let's make housing terminology less confusing and more accessible for everyone. Start exploring now to broaden your knowledge of Nigerian housing styles!")
+    st.header("Welcome to the House Types Visualizer!")
+    st.markdown("Are you curious about the various housing styles in Nigeria and want to understand what different houses look like based on local terminology? This webpage is designed to help you navigate the rich diversity of residential architecture in Nigeria and avoid any confusion when discussing house types. Explore the visual representations of various house types, from flats to bungalows and more, and gain a better understanding of the terminology used in Nigeria's housing landscape. Let's make housing terminology less confusing and more accessible for everyone. Start exploring now to broaden your knowledge of Nigerian housing styles!")
 
 
     house_images = {
@@ -96,11 +96,11 @@ with tab2:
 
 with tab3: 
     st.markdown("# Explore the housing dataset through the following visualizations ")
-    st.markdown(" Welcome to our housing price exploration page. Here, you can investigate property prices based on various factors, such as location and amenities. To view the data in your preferred currency, simply navigate to the 'Currency Converter' tab on the left.")
+    st.markdown(" Welcome to The housing price exploration page. Here, you can investigate property prices based on various factors, such as location and amenities. To view the data in your preferred currency, simply navigate to the 'Currency Converter' tab on the left.")
     
     #Average Housing Price by State
     st.header("Average Housing Price by State")
-    st.markdown("Explore average housing prices by state in Nigeria with our interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each state.")
+    st.markdown("Explore average housing prices by state in Nigeria with this interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each state.")
     mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
     mean_prices_by_state = data.groupby('state')['converted_price'].mean().sort_values(ascending=True)
     num_states = len(mean_prices_by_state)
@@ -127,7 +127,7 @@ with tab3:
 
     #Average Housing Price by Town
     st.header("Average Housing Price by Town")
-    st.markdown("Explore average housing prices by town in Nigeria with our interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each town.")
+    st.markdown("Explore average housing prices by town in Nigeria with this interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each town.")
     mean_prices_by_town = data.groupby('town')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
     num_town = len(mean_prices_by_town)
@@ -156,7 +156,7 @@ with tab3:
 
     #Housing Types Average Price
     st.header("Average Housing Price by House Type")
-    st.markdown("Explore average housing prices by houst type in Nigeria with our interactive bar chart, revealing insights into costs by house type. Hover over any of the bars to see the specific average price. If you need further understanding about what each type of house looks like, nagivate to the Housing Types tab at the top of this page.")
+    st.markdown("Explore average housing prices by houst type in Nigeria with this interactive bar chart, revealing insights into costs by house type. Hover over any of the bars to see the specific average price. If you need further understanding about what each type of house looks like, nagivate to the Housing Types tab at the top of this page.")
     mean_prices_by_title= data.groupby('title')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
     num_houses = len(mean_prices_by_title)
