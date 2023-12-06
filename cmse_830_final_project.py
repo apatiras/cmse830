@@ -47,14 +47,6 @@ with tab1:
     st.markdown("This web app will allow you to receive a prediction of housing prices in Nigeria based on the specified home characteristics. Nigeria’s economic system is heavily negotiation-based. Whether you're in the market buying clothing or looking for a house, almost every price in Nigeria is negotiable. Currently, some severe issues with the country’s economy leave locals and foreigners vulnerable to unreasonable housing costs.  With this web app, those not accustomed to the typical way of negotiations can first view housing prices in specific areas to avoid getting talked into paying more for less.  Additionally, this app may be used to visualize which areas are financially feasible for their living.")
     st.markdown("For those who are potentially not from Nigeria or just looking to investigate different currencies, there is a currency converter on the left sidebar of the screen. Through certain portions of this app there will be an opportunity to display the data through a converted rate. To use the currency converter, you can input any conversion rate into the first box. For example, the conversion to US dollars is 0.0013. The purpose of the second box is to keep track of what currency rate you input in the first box, so you can input rates such as 'USD' or 'Euros' in that field for reference.")
 
-    col1, col2,= st.columns([3,3])
-    dfprint = col1.checkbox("Click to view the dataset")
-    if dfprint: 
-        st.dataframe(data=data)
-    statprint = col2.checkbox("Click to view the basic data statistics")
-    if statprint:
-        df_descr = data.describe(include="all")
-        st.write(df_descr)
 ###############################################################################################################
 
 with tab2:
@@ -108,6 +100,15 @@ with tab3:
     st.markdown("# Explore the housing dataset through the following visualizations ")
     st.markdown(" Welcome to The housing price exploration page. Here, you can investigate property prices based on various factors, such as location and amenities. To view the data in your preferred currency, simply navigate to the 'Currency Converter' tab on the left.")
     
+    col1, col2,= st.columns([3,3])
+    dfprint = col1.checkbox("Click to view the dataset")
+    if dfprint: 
+        st.dataframe(data=data)
+    statprint = col2.checkbox("Click to view the basic data statistics")
+    if statprint:
+        df_descr = data.describe(include="all")
+        st.write(df_descr) 
+
     #Average Housing Price by State
     st.header("Average Housing Price by State")
     st.markdown("Explore average housing prices by state in Nigeria with this interactive bar chart, revealing insights into regional property costs. Hover over any of the bars to see the specific average price of each state.")
@@ -202,7 +203,7 @@ with tab3:
         st.write("The heatmap tells us that bedrooms and bathrooms are most correlated with price.")
     
     # 3D scatter plot using Plotly
-    st.header("Nigeria Housing Dataset 3D Scatter Plot")
+    st.header("Nigeria Housing 3D Exploration")
     st.markdown("Take your data exploration to the next dimension with this interactive 3D scatterplot. Dive into the characteristics of the dataset from a new perspective, gaining deeper insights and uncovering hidden patterns.")
     data_columns = list(data.columns.values)
     options = st.multiselect("Pick three column paramaters for 3D Scatterplot", data_columns, default=data_columns[:3], key='scatter_options', max_selections=3)
@@ -254,7 +255,7 @@ with tab4:
     predicted_price = model.predict(input_data_scaled)[0]
     input_data['predicted_price'] = predicted_price
 
-    st.write(f'Predicted Housing Price : {predicted_price:,.2f}')
+    st.write(f'Predicted Housing Price ₦: {predicted_price:,.2f}')
 
     if conversion_rate != 1: 
         st.write(f'Predicted Price in {currency_name}: {predicted_price*conversion_rate:,.2f}')
@@ -282,12 +283,10 @@ with tab5:
     imagefinal = Image.open("nigeria_pic.jpg")
     st.image(imagefinal)
     st.header("Conclusions")
-    st.markdown("In conclusion, this web app is the result of a labor of love, crafted with the utmost dedication to provide you with a powerful tool to navigate Nigeria's housing market. As a developer, my primary goal has been to empower you, the user, with insights and knowledge that can be pivotal in your housing journey.")
-    st.markdown("Through a collection of user-friendly visualizations, I've designed this app to be your partner in exploring the housing landscape. Whether you're in search of your dream home or considering selling your property, this app is here to equip you with critical information to make informed decisions.")
-    st.markdown("As Nigeria faces economic challenges, this app comes at an opportune time. It places the power to understand housing prices firmly in your hands. You can now gauge what to expect before embarking on your housing search or during negotiations with real estate agents. It's all about ensuring you're well-prepared and well-informed in an ever-evolving real estate market.")
-    st.markdown("The reach of this app isn't limited to just buyers and sellers; it extends to anyone who might be seeking accommodations. In today's dynamic world, where housing concerns touch virtually everyone at some point, the app's versatility becomes its defining feature. It's a resource that's ready to serve you, regardless of where you stand in the real estate landscape.")
+    st.markdown("In conclusion, this web app is the result of a labor of love, crafted with the utmost dedication to provide you with a powerful tool to navigate Nigeria's housing market. Through a collection of user-friendly visualizations, this tool can be your partner in exploring the housing landscape. Whether you're in search of your dream home or considering selling your property, you are now equip you with critical information to make informed decisions.")
+    st.markdown("As Nigeria faces economic challenges, this tool  places the power to understand housing prices firmly in your hands. You can now gauge what to expect before embarking on your housing search or during negotiations with real estate agents. It's all about ensuring you're well-prepared and well-informed in an ever-evolving real estate market.")
+    st.markdown("The reach of this app isn't limited to just buyers and sellers; it extends to anyone who might be seeking accommodations. In today's dynamic world, where housing concerns touch virtually everyone at some point, the  versatility becomes its defining feature. It's a resource that's ready to serve you, regardless of where you stand in the real estate landscape")
     st.markdown("As you embark on your housing journey, remember that you're not alone. I'm here to support you with this app, and together, we can make navigating Nigeria's housing market a smoother, more informed, and ultimately, more successful experience.")
-
 ##################################################################################################################################################################
 
 with tab6:
@@ -298,6 +297,8 @@ with tab6:
     with col1: 
         imagefinal = Image.open("headshot.jpg")
         st.image(imagefinal)
+        imagefinal2 = Image.open("headshot2.jpg")
+        st.image(imagefinal2)
         st.markdown("**Let's Connect:**")
         col3, col4 = st.columns([3,3])
         with col3:
@@ -311,9 +312,9 @@ with tab6:
         st.markdown("My academic journey began at Spelman College, where I earned my Bachelor's of Science in Health Sciences in the spring of 2022. As a Nigerian-American, I am the daughter of a Nigerian immigrant, and my cultural roots deeply influence my perspective and aspirations.")
 
         st.markdown("Venturing into the realm of data science during my undergraduate years marked a pivotal moment. I delved into this dynamic field with my inaugural internship during the pandemic summer of 2020 at Spelman College.")
-    st.markdown("The experience ignited a passion for leveraging data science to make a meaningful impact. The subsequent summer, I undertook another enriching internship at the University of Virginia, where I researched the treatment of patients navigating concurrent ischemic stroke and COVID-19 positivity.")
+        st.markdown("The experience ignited a passion for leveraging data science to make a meaningful impact. The subsequent summer, I undertook another enriching internship at the University of Virginia, where I researched the treatment of patients navigating concurrent ischemic stroke and COVID-19 positivity.")
 
-    st.markdown("Since those transformative experiences, I find myself irresistibly drawn to the intersection of healthcare and data science. My journey reflects a commitment to harnessing the power of data science for the greater good. I view data science as a potent tool, and I am fervently excited about its potential to contribute positively to diverse domains. While my heart lies in the realms of healthcare and data science, I am currently exploring opportunities that extend beyond these boundaries.")
+        st.markdown("Since those transformative experiences, I find myself irresistibly drawn to the intersection of healthcare and data science. My journey reflects a commitment to harnessing the power of data science for the greater good. I view data science as a potent tool, and I am fervently excited about its potential to contribute positively to diverse domains. While my heart lies in the realms of healthcare and data science, I am currently exploring opportunities that extend beyond these boundaries.")
         
     st.markdown("As I navigate the intricacies of data science, my overarching goal remains clear: to utilize this formidable tool to make a difference in the lives of individuals and communities. The dynamic synergy between my passions and the boundless possibilities of data science fuels my drive and enthusiasm for the exciting journey ahead.")
 
