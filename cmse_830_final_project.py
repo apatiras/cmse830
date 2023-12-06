@@ -218,64 +218,77 @@ with tab3:
         st.warning("Please select three columns to create the 3D scatter plot.")
 #####################################################################################################################################################
 with tab4: 
-    st.header("Housing Price Predictor")
-    st.markdown("This Housing Cost Predictor uses an XGBoost Machine Learning model to predict the price of properties based on your specified criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. If you wish to see the prices in a different currency, there is a conversion rate tool that can be found on the left sidebar.  Get started by adjusting the sliders and discover your  housing cost. Below the sliders, costs, and locations, you'll find a map that pinpoints the exact locations for that price. Get started below!")
-    # data_cords['town_state'] = data_cords['town'] + ', ' + data_cords['state']
+    tab7, tab8 = st.tabs(["Housing Price Predictor", "Preprocessing & Methods"])
 
-    num_bath = st.slider("Number of Bathrooms", min_value=1, max_value=9, value=3)
-    num_bed = st.slider("Number of Bedrooms", min_value=1, max_value=9, value=3)
-    num_park = st.slider("Number of Parking Spaces", min_value=1, max_value=9, value=3)
-    num_toilet = st.slider("Number of Toilets", min_value=1, max_value=9, value=3)
-   
-    # model_data = pd.read_csv("modeling_data.csv")
-    model_data_cord = pd.read_csv("modeling_data_cords.csv")
-    numerical_features = ['bedrooms', 'bathrooms', 'toilets', 'parking_space', 'latitude', 'longitude']
-    X = model_data_cord[numerical_features]
-    y = model_data_cord['price']
+    with tab7:
+        st.header("Housing Price Predictor")
+        st.markdown("This Housing Cost Predictor uses an XGBoost Machine Learning model to predict the price of properties based on your specified criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. If you wish to see the prices in a different currency, there is a conversion rate tool that can be found on the left sidebar.  Get started by adjusting the sliders and discover your  housing cost. Below the sliders, costs, and locations, you'll find a map that pinpoints the exact locations for that price. Get started below!")
+        # data_cords['town_state'] = data_cords['town'] + ', ' + data_cords['state']
 
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
+        num_bath = st.slider("Number of Bathrooms", min_value=1, max_value=9, value=3)
+        num_bed = st.slider("Number of Bedrooms", min_value=1, max_value=9, value=3)
+        num_park = st.slider("Number of Parking Spaces", min_value=1, max_value=9, value=3)
+        num_toilet = st.slider("Number of Toilets", min_value=1, max_value=9, value=3)
+    
+        # model_data = pd.read_csv("modeling_data.csv")
+        model_data_cord = pd.read_csv("modeling_data_cords.csv")
+        numerical_features = ['bedrooms', 'bathrooms', 'toilets', 'parking_space', 'latitude', 'longitude']
+        X = model_data_cord[numerical_features]
+        y = model_data_cord['price']
 
-    X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
 
-    model = GradientBoostingRegressor()
+        X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
-    # Train the model
-    model.fit(X_train, y_train)
+        model = GradientBoostingRegressor()
 
-    # Make predictions on the test set
-    # predictions = model.predict(X_test)
-    input_data = pd.DataFrame([[num_bed, num_bath, num_park, num_toilet, 0, 0]], columns=numerical_features)
+        # Train the model
+        model.fit(X_train, y_train)
 
-    input_data['latitude'] = model_data_cord['latitude'].mean()
-    input_data['longitude'] = model_data_cord['longitude'].mean()
+        input_data = pd.DataFrame([[num_bed, num_bath, num_park, num_toilet, 0, 0]], columns=numerical_features)
+
+        input_data['latitude'] = model_data_cord['latitude'].mean()
+        input_data['longitude'] = model_data_cord['longitude'].mean()
 
 
-    input_data_scaled = scaler.transform(input_data)
-    predicted_price = model.predict(input_data_scaled)[0]
-    input_data['predicted_price'] = predicted_price
+        input_data_scaled = scaler.transform(input_data)
+        predicted_price = model.predict(input_data_scaled)[0]
+        input_data['predicted_price'] = predicted_price
 
-    st.write(f'Predicted Housing Price ₦: {predicted_price:,.2f}')
+        st.write(f'Predicted Housing Price ₦: {predicted_price:,.2f}')
 
-    if conversion_rate != 1: 
-        st.write(f'Predicted Price in {currency_name}: {predicted_price*conversion_rate:,.2f}')
+        if conversion_rate != 1: 
+            st.write(f'Predicted Price in {currency_name}: {predicted_price*conversion_rate:,.2f}')
 
-    model_data_cord['distance'] = abs(model_data_cord['price'] - predicted_price)
-    closest_values = model_data_cord.nsmallest(5, 'distance')
+        model_data_cord['distance'] = abs(model_data_cord['price'] - predicted_price)
+        closest_values = model_data_cord.nsmallest(5, 'distance')
 
-    m = folium.Map(location=[closest_values['latitude'].mean(), closest_values['longitude'].mean()], zoom_start=12)
+        m = folium.Map(location=[closest_values['latitude'].mean(), closest_values['longitude'].mean()], zoom_start=12)
 
-    # Plot the top 3 closest locations on the map
-    for _, row in closest_values.iterrows():
-        folium.Marker(
-            location=[row['latitude'], row['longitude']],
-            popup=f'Actual Price: ${row["price"]:.2f}',
-            icon=folium.Icon(color='green')
-        ).add_to(m)
+        # Plot the top 3 closest locations on the map
+        for _, row in closest_values.iterrows():
+            folium.Marker(
+                location=[row['latitude'], row['longitude']],
+                popup=f'Actual Price: ${row["price"]:.2f}',
+                icon=folium.Icon(color='green')
+            ).add_to(m)
 
-# Save or display the map
-    st.markdown("# Price Location Map")
-    st.components.v1.html(m._repr_html_(), height=600, width=800)
+        # Save or display the map
+        st.markdown("# Price Location Map")
+        st.components.v1.html(m._repr_html_(), height=600, width=800)
+    
+    with tab8: 
+        st.markdown(" # Preprocessing")
+        st.markdown("As could be seen through the data exploration tab, the data in this dataset has quite a few outliers. To combat this, the data was cut down to the data between the 10th and 90th quantile. Additionally, a new column was created called total rooms which is the sum of the bathrooms, bedrooms, and toilets.")
+        model2 = model_data_cord.drop(["latitude", "longitude", "distance"], axis=1)
+        st.write(model2.describe()) 
+
+        st.markdown(" # Modeling Results")
+        st.markdown("Several regression modeling techniques were used to create the predictor tool. Those include: Linear Regression , Decision Tree, Random Forest, and Gradient Boost (XGBoost). Mean Squared Error, Root Mean Squared Error, and R2 scores were used to evaluate the models. Results of those models can be seen below.")
+        model_results = pd.read_csv("model_results.csv")
+        st.table(model_results)
+        st.markdown("Due to XGBoost having the highest R2 score, that model was used to create the predictor tool. I ran a grid search to tune the hyperparameters of the model.")
 
 #################################################################################################################################################################
 

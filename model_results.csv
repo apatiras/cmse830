@@ -1,0 +1,5 @@
+﻿Model,Mean Square Error,Root Mean Square Error,R2 Score
+Linear Regression,1.10265E+15,33206136.79,0.1235
+Decision Tree,1.52437E+15,39043232.33,0.1988
+Random Forest ,1.02151E+15,31961052.13,0.188
+XGBoost Regressor,1.00791E+15,31747536.21,0.2118
