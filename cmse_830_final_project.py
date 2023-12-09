@@ -167,7 +167,7 @@ with tab3:
 
     #Housing Types Average Price
     st.header("Average Housing Price by House Type")
-    st.markdown("Explore average housing prices by houst type in Nigeria with this interactive bar chart, revealing insights into costs by house type. Hover over any of the bars to see the specific average price. If you need further understanding about what each type of house looks like, nagivate to the Housing Types tab at the top of this page.")
+    st.markdown("Explore average housing prices by house type in Nigeria with this interactive bar chart, revealing insights into costs by house type. Hover over any of the bars to see the specific average price. If you need further understanding about what each type of house looks like, nagivate to the Housing Types tab at the top of this page.")
     mean_prices_by_title= data.groupby('title')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
     num_houses = len(mean_prices_by_title)
@@ -204,7 +204,7 @@ with tab3:
     
     # 3D scatter plot using Plotly
     st.header("Nigeria Housing 3D Exploration")
-    st.markdown("Take your data exploration to the next dimension with this interactive 3D scatterplot. Dive into the characteristics of the dataset from a new perspective, gaining deeper insights and uncovering hidden patterns.")
+    st.markdown("Take your data exploration to the next dimension with this interactive 3D scatterplot. Dive into the characteristics of the dataset from your own perspective, gaining deeper insights and uncovering hidden patterns.")
     data_columns = list(data.columns.values)
     options = st.multiselect("Pick three column paramaters for 3D Scatterplot", data_columns, default=data_columns[:3], key='scatter_options', max_selections=3)
     selected_state = st.multiselect("Select State to Display", data['state'].unique())
@@ -223,15 +223,14 @@ with tab4:
     with tab7:
         st.header("Housing Price Predictor")
         st.markdown("This Housing Cost Predictor uses an XGBoost Machine Learning model to predict the price of properties based on your specified criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. If you wish to see the prices in a different currency, there is a conversion rate tool that can be found on the left sidebar.  Get started by adjusting the sliders and discover your  housing cost. Below the sliders, costs, and locations, you'll find a map that pinpoints the exact locations for that price. Get started below!")
-        # data_cords['town_state'] = data_cords['town'] + ', ' + data_cords['state']
-
+        
         num_bath = st.slider("Number of Bathrooms", min_value=1, max_value=9, value=3)
         num_bed = st.slider("Number of Bedrooms", min_value=1, max_value=9, value=3)
         num_park = st.slider("Number of Parking Spaces", min_value=1, max_value=9, value=3)
         num_toilet = st.slider("Number of Toilets", min_value=1, max_value=9, value=3)
     
-        # model_data = pd.read_csv("modeling_data.csv")
-        model_data_cord = pd.read_csv("modeling_data_cords.csv")
+        
+        model_data_cord = pd.read_csv("modeling_data_cords2.csv")
         numerical_features = ['bedrooms', 'bathrooms', 'toilets', 'parking_space', 'latitude', 'longitude']
         X = model_data_cord[numerical_features]
         y = model_data_cord['price']
@@ -274,21 +273,75 @@ with tab4:
                 icon=folium.Icon(color='green')
             ).add_to(m)
 
-        # Save or display the map
+        # display the map
         st.markdown("# Price Location Map")
+        st.markdown("Below is a map that will pinpoint a location where your predicted price can be find. ")
         st.components.v1.html(m._repr_html_(), height=600, width=800)
     
     with tab8: 
         st.markdown(" # Preprocessing")
-        st.markdown("As could be seen through the data exploration tab, the data in this dataset has quite a few outliers. To combat this, the data was cut down to the data between the 10th and 90th quantile. Additionally, a new column was created called total rooms which is the sum of the bathrooms, bedrooms, and toilets.")
-        model2 = model_data_cord.drop(["latitude", "longitude", "distance"], axis=1)
+        st.markdown("As could be seen through the data exploration tab, the data in this dataset has quite a few outliers, which was negatively affecting the modeling results. To combat this, I went through the following preprocessing steps:")
+        st.markdown("\t 1. Data was cut down to only the data lying between the 10th and 90th quantile.")
+        st.markdown("\t 2. Removed towns with less than 15 entries and states with less than 60 entries.")
+        st.markdown("\t 3. Finally, a standard scaler was applied to the dataset before modeling.")
+        st.markdown("Below are the resulting basic statistics after preprocessing.")
+        model2 = model_data_cord.drop(["latitude", "longitude", "distance", "total_rooms"], axis=1)
         st.write(model2.describe()) 
+        data = model2
+        ####
+        st.markdown("Updated average housing prices by state after preprocessing")
+        mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
+        mean_prices_by_state = data.groupby('state')['price'].mean().sort_values(ascending=True)
+        num_states = len(mean_prices_by_state)
+        cmap = cm.get_cmap("magma", num_states)
+        chart = altair.Chart(mean_prices_by_state.reset_index()).mark_bar().encode(
+            x='state:N',
+            y='price:Q',
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+        ).properties(width=600)
+        st.altair_chart(chart, use_container_width=True)
+
+        #Average Housing Price by Town
+        st.markdown("Updated average housing prices by town after preprocessing")
+        mean_prices_by_town = data.groupby('town')['price'].mean().sort_values(ascending=True)
+        mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
+        num_town = len(mean_prices_by_town)
+        cmap = cm.get_cmap("magma", num_town)
+        chart2 = altair.Chart(mean_prices_by_town.reset_index()).mark_bar().encode(
+            x='town:N',
+            y='price:Q',
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+        ).properties(width=600)
+        st.altair_chart(chart2, use_container_width=True)
+
+        #Housing Types Average Price
+        
+        st.markdown("Updated average housing prices by state after preprocessing")
+        mean_prices_by_title= data.groupby('title')['price'].mean().sort_values(ascending=True)
+        mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
+        num_houses = len(mean_prices_by_title)
+        cmap = cm.get_cmap("magma", num_houses)
+        chart = altair.Chart(mean_prices_by_title.reset_index()).mark_bar().encode(
+            x='title:N',
+            y='price:Q',
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+        ).properties(width=600)
+        st.altair_chart(chart, use_container_width=True)
+    
+        # Code used for preprocessing. saved preprocessed data to csv file that included the longitude and latitude coordinates
+        # process_df2 = q1, q9 = df["price"].quantile([0.10,0.90])
+        # mask_df2 = df2["price"].between(q1,q9)
+        # processed_df2 = df2[mask_df]
+        # processed_df2 = processed_df2[~processed_df2['state'].isin(state_counts[state_counts < 60].index)]
+        # processed_df2 = processed_df2[~processed_df2['town'].isin(town_counts[town_counts < 15].index)]
+        # processed_df2.to_csv('/content/drive/MyDrive/modeling_data_cords2.csv', index=False)
 
         st.markdown(" # Modeling Results")
-        st.markdown("Several regression modeling techniques were used to create the predictor tool. Those include: Linear Regression , Decision Tree, Random Forest, and Gradient Boost (XGBoost). Mean Squared Error, Root Mean Squared Error, and R2 scores were used to evaluate the models. Results of those models can be seen below.")
+        st.markdown("Several regression modeling techniques were used to create the predictor tool. The 3 best models include: Linear Regression,  Random Forest, and Gradient Boost (XGBoost). Median Absolute Error, Root Mean Square Error, and $R^2$ scores were used to evaluate the models. Results of those models can be seen below.")
         model_results = pd.read_csv("model_results.csv")
         st.table(model_results)
-        st.markdown("Due to XGBoost having the highest R2 score, that model was used to create the predictor tool. I ran a grid search to tune the hyperparameters of the model.")
+        st.markdown("Due to XGBoost having the highest $R^2$ score and lowest Median Absolute Error, that model was used to create the predictor tool. Below are the final scores for the MSE, RMSE, and $R^2$ : ")
+
 
 #################################################################################################################################################################
 
