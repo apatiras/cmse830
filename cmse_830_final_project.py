@@ -284,12 +284,13 @@ with tab4:
         st.markdown("\t 1. Data was cut down to only the data lying between the 10th and 90th quantile.")
         st.markdown("\t 2. Removed towns with less than 15 entries and states with less than 60 entries.")
         st.markdown("\t 3. Finally, a standard scaler was applied to the dataset before modeling.")
-        st.markdown("Below are the resulting basic statistics after preprocessing.")
+        st.markdown("## Below are the resulting basic statistics and averages after preprocessing:")
+        st.markdown("**Updated Basic Statistics:**")
         model2 = model_data_cord.drop(["latitude", "longitude", "distance", "total_rooms"], axis=1)
         st.write(model2.describe()) 
         data = model2
         ####
-        st.markdown("Updated average housing prices by state after preprocessing")
+        st.markdown("**Updated average housing prices by state:**")
         mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
         mean_prices_by_state = data.groupby('state')['price'].mean().sort_values(ascending=True)
         num_states = len(mean_prices_by_state)
@@ -302,7 +303,7 @@ with tab4:
         st.altair_chart(chart, use_container_width=True)
 
         #Average Housing Price by Town
-        st.markdown("Updated average housing prices by town after preprocessing")
+        st.markdown("**Updated average housing prices by town:**")
         mean_prices_by_town = data.groupby('town')['price'].mean().sort_values(ascending=True)
         mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
         num_town = len(mean_prices_by_town)
@@ -316,7 +317,7 @@ with tab4:
 
         #Housing Types Average Price
         
-        st.markdown("Updated average housing prices by state after preprocessing")
+        st.markdown("**Updated average housing prices by house type:**")
         mean_prices_by_title= data.groupby('title')['price'].mean().sort_values(ascending=True)
         mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
         num_houses = len(mean_prices_by_title)
