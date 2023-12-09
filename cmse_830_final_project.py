@@ -115,11 +115,11 @@ with tab3:
     mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
     mean_prices_by_state = data.groupby('state')['converted_price'].mean().sort_values(ascending=True)
     num_states = len(mean_prices_by_state)
-    cmap = cm.get_cmap("viridis", num_states)
+    cmap = cm.get_cmap("turbo", num_states)
     chart = altair.Chart(mean_prices_by_state.reset_index()).mark_bar().encode(
         x='state:N',
         y='converted_price:Q',
-        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='viridis'))
+        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='turbo'))
     ).properties(width=600)
     st.altair_chart(chart, use_container_width=True)
     if st.button("Click to read state findings."):
@@ -142,11 +142,11 @@ with tab3:
     mean_prices_by_town = data.groupby('town')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
     num_town = len(mean_prices_by_town)
-    cmap = cm.get_cmap("viridis", num_town)
+    cmap = cm.get_cmap("turbo", num_town)
     chart2 = altair.Chart(mean_prices_by_town.reset_index()).mark_bar().encode(
         x='town:N',
         y='converted_price:Q',
-        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='viridis'))
+        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='turbo'))
     ).properties(width=600)
     st.altair_chart(chart2, use_container_width=True)
     
@@ -171,11 +171,11 @@ with tab3:
     mean_prices_by_title= data.groupby('title')['converted_price'].mean().sort_values(ascending=True)
     mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
     num_houses = len(mean_prices_by_title)
-    cmap = cm.get_cmap("viridis", num_houses)
+    cmap = cm.get_cmap("turbo", num_houses)
     chart = altair.Chart(mean_prices_by_title.reset_index()).mark_bar().encode(
         x='title:N',
         y='converted_price:Q',
-        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='viridis'))
+        color=altair.Color('converted_price:Q', scale=altair.Scale(scheme='turbo'))
     ).properties(width=600)
     st.altair_chart(chart, use_container_width=True)
     if st.button("Click to read house findings."):
@@ -195,7 +195,7 @@ with tab3:
     #Correlation Heatmap
     st.header("Correlation Heatmap")
     st.markdown("Explore correlations found between the numerical features in the data. All correlations are interpreted using the absolute value of the number.")
-    datacor = data.drop(['title', 'town', 'state'], axis=1)
+    datacor = data.drop(['title', 'town', 'state', 'converted_price'], axis=1)
     fig, ax = plt.subplots()
     sns.heatmap(datacor.corr(), annot= True, ax=ax)
     st.pyplot(fig)
@@ -224,10 +224,10 @@ with tab4:
         st.header("Housing Price Predictor")
         st.markdown("This Housing Cost Predictor uses an XGBoost Machine Learning model to predict the price of properties based on your specified criteria. Whether you're looking for a home with a certain number of bedrooms, bathrooms, parking spaces, or toilets, this tool provides you with valuable insights. Find out the average price in different towns and states to make an informed decision when searching for your next home. If you wish to see the prices in a different currency, there is a conversion rate tool that can be found on the left sidebar.  Get started by adjusting the sliders and discover your  housing cost. Below the sliders, costs, and locations, you'll find a map that pinpoints the exact locations for that price. Get started below!")
         
-        num_bath = st.slider("Number of Bathrooms", min_value=1, max_value=9, value=3)
-        num_bed = st.slider("Number of Bedrooms", min_value=1, max_value=9, value=3)
-        num_park = st.slider("Number of Parking Spaces", min_value=1, max_value=9, value=3)
-        num_toilet = st.slider("Number of Toilets", min_value=1, max_value=9, value=3)
+        num_bath = st.slider("Number of Bathrooms", min_value=1, max_value=9, value=2)
+        num_bed = st.slider("Number of Bedrooms", min_value=1, max_value=9, value=2)
+        num_park = st.slider("Number of Parking Spaces", min_value=1, max_value=9, value=2)
+        num_toilet = st.slider("Number of Toilets", min_value=1, max_value=9, value=2)
     
         
         model_data_cord = pd.read_csv("modeling_data_cords2.csv")
@@ -261,11 +261,11 @@ with tab4:
             st.write(f'Predicted Price in {currency_name}: {predicted_price*conversion_rate:,.2f}')
 
         model_data_cord['distance'] = abs(model_data_cord['price'] - predicted_price)
-        closest_values = model_data_cord.nsmallest(5, 'distance')
+        closest_values = model_data_cord.nsmallest(10, 'distance')
 
-        m = folium.Map(location=[closest_values['latitude'].mean(), closest_values['longitude'].mean()], zoom_start=12)
+        m = folium.Map(location=[closest_values['latitude'].mean(), closest_values['longitude'].mean()], zoom_start=6)
 
-        # Plot the top 3 closest locations on the map
+        # Plot the top closest locations on the map
         for _, row in closest_values.iterrows():
             folium.Marker(
                 location=[row['latitude'], row['longitude']],
@@ -293,11 +293,11 @@ with tab4:
         mean_prices_by_state_org = data.groupby('state')['price'].mean().sort_values(ascending=True)
         mean_prices_by_state = data.groupby('state')['price'].mean().sort_values(ascending=True)
         num_states = len(mean_prices_by_state)
-        cmap = cm.get_cmap("magma", num_states)
+        cmap = cm.get_cmap("turbo", num_states)
         chart = altair.Chart(mean_prices_by_state.reset_index()).mark_bar().encode(
             x='state:N',
             y='price:Q',
-            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='turbo'))
         ).properties(width=600)
         st.altair_chart(chart, use_container_width=True)
 
@@ -306,11 +306,11 @@ with tab4:
         mean_prices_by_town = data.groupby('town')['price'].mean().sort_values(ascending=True)
         mean_prices_by_town_org = data.groupby('town')['price'].mean().sort_values(ascending=True)
         num_town = len(mean_prices_by_town)
-        cmap = cm.get_cmap("magma", num_town)
+        cmap = cm.get_cmap("turbo", num_town)
         chart2 = altair.Chart(mean_prices_by_town.reset_index()).mark_bar().encode(
             x='town:N',
             y='price:Q',
-            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='turbo'))
         ).properties(width=600)
         st.altair_chart(chart2, use_container_width=True)
 
@@ -320,11 +320,11 @@ with tab4:
         mean_prices_by_title= data.groupby('title')['price'].mean().sort_values(ascending=True)
         mean_prices_by_title_org = data.groupby('title')['price'].mean().sort_values(ascending=True)
         num_houses = len(mean_prices_by_title)
-        cmap = cm.get_cmap("magma", num_houses)
+        cmap = cm.get_cmap("turbo", num_houses)
         chart = altair.Chart(mean_prices_by_title.reset_index()).mark_bar().encode(
             x='title:N',
             y='price:Q',
-            color=altair.Color('price:Q', scale=altair.Scale(scheme='magma'))
+            color=altair.Color('price:Q', scale=altair.Scale(scheme='turbo'))
         ).properties(width=600)
         st.altair_chart(chart, use_container_width=True)
     
